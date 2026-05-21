@@ -127,6 +127,109 @@ hello-world
 ```
  
 ---
+
+## 7. Batch File Rename
+ 
+Bulk renames files automatically.
+ 
+**Useful for:**
+ 
+- Reports
+- Exports
+- Invoices
+- Media files
+- Operational documents
+**Features**
+ 
+- Preview mode
+- Overwrite protection
+- Folder-safe renaming
+- Rename summary
+**Preview Changes**
+ 
+```bash
+python toolkit.py batchrename report invoice --preview
+```
+ 
+**Execute Rename**
+ 
+```bash
+python toolkit.py batchrename report invoice
+```
+ 
+---
+ 
+## 8. Password Generator
+ 
+Generates secure random passwords.
+ 
+**Features**
+ 
+- Configurable length
+- Optional symbols
+- Optional numbers
+- Strong randomness
+**Example**
+ 
+```bash
+python toolkit.py password 16 --symbols
+```
+ 
+**Example Output**
+ 
+```
+🔐 SECURE PASSWORD
+-----------------------------------
+A9#xQ1@Lm2!Rt7Z
+```
+ 
+---
+ 
+## 9. QR Code Generator
+ 
+Generates QR codes for:
+ 
+- URLs
+- Documents
+- Payment links
+- Internal systems
+**Example**
+ 
+```bash
+python toolkit.py qr "https://google.com" --output google_qr
+```
+ 
+**Output**
+ 
+```
+exports/google_qr.png
+```
+ 
+---
+ 
+## 10. Command History Logging
+ 
+Automatically logs executed commands with timestamps.
+ 
+**Useful for:**
+ 
+- Auditing
+- Debugging
+- Workflow tracking
+- Operational monitoring
+**Example Log Entry**
+ 
+```
+[2026-05-20 14:32:11] toolkit.py gst 5000 luxury
+```
+ 
+Logs are stored in:
+ 
+```
+toolkit.log
+```
+ 
+---
  
 ## 🧠 Technical Highlights
  
@@ -150,10 +253,23 @@ hello-world
 ## 📂 Project Structure
  
 ```
-toolkit-project/
+Toolkit/
 │
+├── __pycache__/
+├── age_calc.py
+├── batch_rename.py
+├── currency_convert.py
+├── GST.py
+├── id_generator.py
+├── log_command.py
+├── password_generator.py
+├── qr_generator.py
+├── rename_file.py
+├── slugify.py
 ├── toolkit.py
-├── README.md
+├── toolkit.log
+├── tmp.txt
+└── README.md
 ```
  
 ---
@@ -175,7 +291,7 @@ cd Toolkit
 Run commands:
  
 ```bash
-python toolkit.py --help
+python3 toolkit.py --help
 ```
  
 ---
@@ -218,16 +334,6 @@ Toolkit CLI safely handles:
 - Slug generation utility
 ---
  
-## 📈 Future Enhancements
- 
-Planned upgrades:
- 
-- Password generator
-- QR code generator
-- Batch file rename
-- Command history logging
-- Interactive shell mode
----
  
 ## 👨‍💻 Why This Project Matters
  

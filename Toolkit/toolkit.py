@@ -5,6 +5,10 @@ from age_calc import ageCalc
 from id_generator import idGenerator
 from rename_file import renameFile
 from slugify import slugifyText
+from password_generator import passwordGen
+from qr_generator import qrGen
+from batch_rename import batchRename
+from log_command import logCommand
 
 def usage():
 
@@ -150,9 +154,68 @@ slug_parser.add_argument(
     )
 slug_parser.set_defaults(func=slugifyText)
 
+password_parser= subparsers.add_parser("password", help="Generate secure password")
+password_parser.add_argument(
+    "length",
+    type=int,
+    help="Password length"
+)
+password_parser.add_argument(
+    "--symbols",
+    action="store_true",
+    help="Include symbols"
+)
+password_parser.add_argument(
+    "--no-numbers",
+    action="store_true",
+    help="Exclude numbers"
+)
+password_parser.set_defaults(
+    func=passwordGen
+)
+
+qr_parser = subparsers.add_parser(
+    "qr",
+    help="Generate QR code"
+)
+qr_parser.add_argument(
+    "text",
+    help="Text or URL"
+)
+qr_parser.add_argument(
+    "--output",
+    default="qr_code",
+    help="Output filename"
+)
+qr_parser.set_defaults(
+    func=qrGen
+)
+
+batchRename_parser= subparsers.add_parser("batchrename", help="Rename multiple files")
+batchRename_parser.add_argument(
+    "old",
+    help="Text to replace"
+)
+
+batchRename_parser.add_argument(
+    "new",
+    help="Replacement text"
+)
+
+batchRename_parser.add_argument(
+    "--preview",
+    action="store_true",
+    help="Preview changes only"
+)
+
+batchRename_parser.set_defaults(
+    func=batchRename
+)
+
 args=parser.parse_args()
 
 if hasattr(args, "func"):
+    logCommand(sys.argv)
     args.func(args)
 else:
     parser.print_help()
