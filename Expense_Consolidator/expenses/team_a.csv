@@ -1,0 +1,5 @@
+Date,Amount,Vendor,Category
+2026-01-01,500,Uber,
+2026-01-02,700,Swiggy,Meals
+BAD_ROW
+2026-01-03,1200,AWS,

@@ -1,0 +1,5 @@
+date, amount ,vendor,category
+2026-01-04,300,Ola,
+2026-01-05,450,Zomato,
+BROKEN_DATA
+2026-01-06,900,GCP,Infrastructure

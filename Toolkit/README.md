@@ -279,7 +279,7 @@ Toolkit/
 Clone the repository:
  
 ```bash
-git clone <your-repo-url>
+git clone "https://github.com/BhaumikLuhar/mini-python-projects.git"
 ```
  
 Move into project folder:

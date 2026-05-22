@@ -1,0 +1,6 @@
+{
+    "Travel": ["uber", "ola"],
+    "Meals": ["swiggy", "zomato"],
+    "Infrastructure": ["aws", "gcp"],
+    "Shopping": ["amazon", "flipkart"]
+}
