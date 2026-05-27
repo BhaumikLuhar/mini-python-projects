@@ -1,5 +1,22 @@
 from datetime import datetime, timedelta
 import re
+from rapidfuzz import fuzz
+
+
+def fuzzy_matches(note, query, threshold=70):
+    """
+    Fuzzy search note fields.
+    """
+
+    searchable_text = " ".join([
+        note["title"],
+        " ".join(note["tags"]),
+        note["body"]
+    ])
+
+    score=fuzz.partial_ratio(query.lower(),searchable_text.lower())
+
+    return score>=threshold
 
 def matches_query(note, query):
     """
@@ -44,7 +61,7 @@ def search_notes(notes,query):
     results=[]
 
     for note in notes:
-        if matches_query(note,query):
+        if matches_query(note,query) or fuzzy_matches(note,query):
             snippet=build_snippet(note["body"],query)
 
             results.append({

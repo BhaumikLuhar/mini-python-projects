@@ -31,8 +31,12 @@ The application supports:
 - Structured frontmatter metadata
 - Tag-based filtering
 - Full-text search
+- Fuzzy search support
 - Recent notes filtering
-- Safe deletion confirmation
+- Tag management
+- Safe deletion with confirmation
+- In-editor note editing via `EDITOR` variable
+- HTML export
 - Modular architecture
 - Error handling for malformed notes
 
@@ -56,10 +60,12 @@ notes-app/
 ├── noteapp/
 │   ├── storage.py
 │   ├── search.py
+│   ├── export.py
 │   ├── cli.py
 │   └── main.py
 │
 ├── notes/
+├── exports/
 ├── README.md
 ├── requirements.txt
 └── .gitignore
@@ -106,13 +112,25 @@ pip install -r requirements.txt
 
 ## 🚀 Usage
 
-**Create note:**
+### 1. Create a Note
+
+Creates a new markdown note with auto-generated slug and frontmatter. Opens in your configured editor automatically if `EDITOR` is set.
 
 ```bash
 python -m noteapp.main new "Quarterly Planning"
 ```
 
-**List notes:**
+**Output:**
+
+```
+Created note: notes/2026-05-27-quarterly-planning.md
+```
+
+---
+
+### 2. List Notes
+
+Lists all notes with title, tags, and creation date.
 
 ```bash
 python -m noteapp.main list
@@ -124,22 +142,138 @@ python -m noteapp.main list
 python -m noteapp.main list --tag planning
 ```
 
-**Search notes:**
+**Filter by last N days:**
+
+```bash
+python -m noteapp.main list --last 7
+```
+
+---
+
+### 3. Search Notes
+
+Performs full-text search across all note content and metadata.
 
 ```bash
 python -m noteapp.main search budget
 ```
 
-**Show recent notes:**
+**Output:**
 
-```bash
-python -m noteapp.main list --recent
+```
+- 2026-05-27-quarterly-planning
+  Title: Quarterly Planning
+  Tags: planning, meetings
+  Snippet: ...reviewed the budget for Q3...
 ```
 
-**Delete note:**
+---
+
+### 4. Fuzzy Search
+
+Finds notes even with partial or approximate matches — useful when you can't remember the exact keyword.
+
+```bash
+python -m noteapp.main search quaterly
+```
+
+Returns results even if the query doesn't exactly match note content.
+
+---
+
+### 5. Add Tag to Note
+
+Adds a new tag to an existing note by slug.
+
+```bash
+python -m noteapp.main tag 2026-05-27-quarterly-planning finance
+```
+
+**Output:**
+
+```
+Tag added successfully.
+```
+
+---
+
+### 6. Edit a Note
+
+Opens an existing note in your configured terminal editor.
+
+```bash
+export EDITOR=code
+python -m noteapp.main edit 2026-05-27-meeting-notes
+```
+
+Supported editors: `code`, `vim`, `nano`, `nvim`, or any editor available in your `PATH`.
+
+If `EDITOR` is not set:
+
+```
+EDITOR environment variable is not set.
+```
+
+---
+
+### 7. Delete a Note
+
+Safely deletes a note after explicit confirmation.
 
 ```bash
 python -m noteapp.main delete 2026-05-27-quarterly-planning
+```
+
+**Prompt:**
+
+```
+Delete 'Quarterly Planning'? Type 'yes' to confirm:
+```
+
+**If cancelled:**
+
+```
+Deletion cancelled.
+```
+
+---
+
+### 8. Export Notes to HTML
+
+Exports all notes into a single structured HTML file.
+
+```bash
+python -m noteapp.main export
+```
+
+**Output:**
+
+```
+Exported HTML to: exports/notes.html
+```
+
+Useful for sharing notes, archiving, or viewing in a browser.
+
+---
+
+### 9. Version Info
+
+```bash
+python -m noteapp.main --version
+```
+
+**Output:**
+
+```
+main.py 1.0.0
+```
+
+---
+
+### 10. Help Menu
+
+```bash
+python -m noteapp.main --help
 ```
 
 ---
@@ -181,12 +315,13 @@ The application safely handles:
 
 Business logic is cleanly separated across focused modules:
 
-| Module       | Responsibility                        |
-|--------------|---------------------------------------|
-| `storage.py` | File I/O, note saving and loading     |
-| `search.py`  | Full-text and tag-based search logic  |
-| `cli.py`     | Argument parsing and command routing  |
-| `main.py`    | Entry point and application bootstrap |
+| Module       | Responsibility                              |
+|--------------|---------------------------------------------|
+| `storage.py` | File I/O, note saving and loading           |
+| `search.py`  | Full-text, fuzzy, and tag-based search      |
+| `export.py`  | HTML export of all notes                    |
+| `cli.py`     | Argument parsing and command routing        |
+| `main.py`    | Entry point and application bootstrap       |
 
 ### Slug Generation
 
@@ -206,13 +341,13 @@ All notes are stored as plain markdown files — no database, no cloud dependenc
 
 Potential enhancements:
 
-- HTML export
-- Fuzzy search
 - Synced cloud folder support
 - Rich terminal formatting
-- Interactive note editing
 - Note templates
 - Archive and restore functionality
+- SQLite-backed note indexing
+- PDF export
+- Batch tag operations
 
 ---
 

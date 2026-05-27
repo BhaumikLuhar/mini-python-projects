@@ -15,6 +15,7 @@ from noteapp.search import (
     filter_by_tag,
     filter_recent_notes
 )
+from noteapp.export import export_html
 APP_VERSION = "1.0.0"
 
 def handle_new(args):
@@ -158,6 +159,54 @@ def handle_delete(args):
     print("Note deleted.")
 
 
+def handle_export(args):
+    """
+    Export notes to HTML.
+    """
+
+    notes = load_all_notes()
+
+    path = export_html(notes)
+
+    print(f"Exported HTML to: {path}")
+
+
+def handle_edit(args):
+    """
+    Open note in configured editor.
+    """
+
+    notes = load_all_notes()
+
+    note = find_note_by_slug(
+        notes,
+        args.slug
+    )
+
+    if not note:
+        print("Note not found.")
+        return
+
+    editor = os.environ.get("EDITOR")
+
+    if not editor:
+        print(
+            "EDITOR environment variable is not set."
+        )
+
+        return
+
+    try:
+        subprocess.run([
+            editor,
+            note["path"]
+        ])
+
+    except FileNotFoundError:
+        print(
+            f"Editor '{editor}' not found."
+        )
+
 
 def run():
     """
@@ -251,6 +300,31 @@ Create, search, tag, and manage markdown notes.""")
 
     delete_parser.set_defaults(
         func=handle_delete
+    )
+
+
+    export_parser = subparsers.add_parser(
+        "export",
+        help="Export notes as HTML"
+    )
+
+    export_parser.set_defaults(
+        func=handle_export
+    )
+
+
+    edit_parser = subparsers.add_parser(
+        "edit",
+        help="Edit existing note"
+    )
+
+    edit_parser.add_argument(
+        "slug",
+        help="Note slug"
+    )
+
+    edit_parser.set_defaults(
+        func=handle_edit
     )
 
 
