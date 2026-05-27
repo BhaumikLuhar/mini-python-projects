@@ -15,7 +15,7 @@ from noteapp.search import (
     filter_by_tag,
     filter_recent_notes
 )
-
+APP_VERSION = "1.0.0"
 
 def handle_new(args):
     """
@@ -167,7 +167,11 @@ def run():
     parser=argparse.ArgumentParser(description="""Markdown Notes CLI
 
 Create, search, tag, and manage markdown notes.""")
-
+    parser.add_argument(
+    "--version",
+    action="version",
+    version=f"%(prog)s {APP_VERSION}"
+)
     subparsers=parser.add_subparsers(dest="command")
 
     new_parser=subparsers.add_parser("new",help="Create new file.")
