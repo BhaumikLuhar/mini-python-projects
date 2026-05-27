@@ -31,6 +31,7 @@ def build_snippet(body,query,length=80):
     end=min(index+length,len(body))
 
     snippet=body[start:end]
+    snippet=re.sub(r"\s+"," ",snippet)
 
     return ("..." if start!=0 else "")+snippet.replace("\n"," ")+("..." if end!=len(body) else "")
 

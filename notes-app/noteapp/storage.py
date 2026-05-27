@@ -74,6 +74,12 @@ def create_note(title,tags=None):
     """
 
     path=build_note_path(title)
+
+    if path.exists():
+        raise FileExistsError(
+            f"Note already exists: {path.name}"
+        )
+    
     content=create_note_content(title,tags)
 
     with open(path,"w",encoding="utf-8") as f:
@@ -111,6 +117,20 @@ def parse_frontmatter(content):
             tag.strip() for tag in metadata["tags"].split(",") if tag.strip()
         ]
 
+    required_fields = [
+    "title",
+    "tags",
+    "created"
+    ]
+
+    for field in required_fields:
+
+        if field not in metadata:
+            raise ValueError(
+                f"Missing required field: {field}"
+            )
+        
+
     return metadata, body
 
 
@@ -125,7 +145,10 @@ def load_note(path):
     except FileNotFoundError:
         raise FileNotFoundError(f"Note not found: {path}")
     
-    metadata,body=parse_frontmatter(content)
+    try:
+        metadata,body=parse_frontmatter(content)
+    except ValueError as e:
+        print(f"{path}: {e}")
 
     note={
         "title":metadata.get("title",""),
@@ -174,7 +197,7 @@ def load_all_notes():
             notes.append(note)
 
         except ValueError as error:
-            print(f"Warning: {path} skipped ({error})")
+            print(f"[WARNING] Skipping malformed note: {error}")
 
     return notes
 
@@ -189,27 +212,3 @@ def delete_note(path):
         raise FileNotFoundError(f"Note not found: {path}")
 
     path.unlink()
-
-
-
-
-
-
-
-
-# if __name__ == "__main__":
-
-#     created_path = create_note(
-#         "Backend Architecture",
-#         ["python", "storage"]
-#     )
-
-#     print("Created:", created_path)
-
-#     note = load_note(created_path)
-
-#     print("\nLoaded Note:")
-#     print(note)
-
-#     print("\nAll Notes:")
-#     print(load_all_notes())

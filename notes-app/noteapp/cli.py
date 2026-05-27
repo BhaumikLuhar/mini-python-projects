@@ -1,4 +1,7 @@
 import argparse
+import os
+from re import error
+import subprocess
 
 from noteapp.storage import (
     create_note,
@@ -18,10 +21,23 @@ def handle_new(args):
     """
     Create a new note.
     """
+    if not args.title.strip():
+        print("Error: Title cannot be empty.")
+        return
+    
+    try:
+        path=create_note(args.title)
 
-    path=create_note(args.title)
+        print(f"Created note: {path}")
 
-    print(f"Created note: {path}")
+        editor = os.environ.get("EDITOR")
+
+        if editor:
+            subprocess.run([editor, str(path)])
+
+
+    except FileExistsError as e:
+        print(f"Error: {e}")
 
 
 def handle_list(args):
@@ -129,9 +145,11 @@ def handle_delete(args):
         print("Note not found.")
         return
     
-    confirm=input(f"Delete '{note['title']}'? (y/n): ")
+    confirm = input(
+    f"Delete '{note['title']}'? Type 'yes' to confirm: "
+)
 
-    if confirm.lower()!="y":
+    if confirm.lower() != "yes":
         print("Deletion cancelled.")
         return
     
@@ -146,7 +164,9 @@ def run():
     Main CLI entrypoint.
     """
 
-    parser=argparse.ArgumentParser(description="Markdown Notes CLI")
+    parser=argparse.ArgumentParser(description="""Markdown Notes CLI
+
+Create, search, tag, and manage markdown notes.""")
 
     subparsers=parser.add_subparsers(dest="command")
 
@@ -236,4 +256,8 @@ def run():
         parser.print_help()
         return
 
-    args.func(args)
+    try:
+        args.func(args)
+
+    except Exception as error:
+        print(f"Unexpected error: {error}")
