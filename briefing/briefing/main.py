@@ -1,31 +1,41 @@
-from briefing.cache import (
-    load_cache,
-    save_cache,
+import asyncio
+
+import httpx
+
+from briefing.fetchers import (
+    fetch_fx,
+    fetch_news,
+    fetch_weather,
 )
-from briefing.config import CACHE_TTL_SECONDS
+
+
+async def fetch_briefing():
+
+    async with httpx.AsyncClient(verify=False) as client:
+
+        weather, news, fx = (
+            await asyncio.gather(
+                fetch_weather(client),
+                fetch_news(client),
+                fetch_fx(client),
+                return_exceptions=True,
+            )
+        )
+
+    return {
+        "weather": weather,
+        "news": news,
+        "fx": fx,
+    }
 
 
 def main() -> None:
 
-    cached = load_cache(
-        "test",
-        CACHE_TTL_SECONDS,
+    briefing = asyncio.run(
+        fetch_briefing()
     )
 
-    if cached:
-        print("Loaded from cache:")
-        print(cached)
-
-    else:
-        print("No valid cache found")
-
-        data = {
-            "message": "hello world"
-        }
-
-        save_cache("test", data)
-
-        print("Saved new cache")
+    print(briefing)
 
 
 if __name__ == "__main__":

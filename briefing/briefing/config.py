@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,6 +8,8 @@ CACHE_DIR = BASE_DIR / "cache"
 CACHE_TTL_SECONDS = 600
 
 REQUEST_TIMEOUT = 10
+
+load_dotenv(BASE_DIR / ".env")
 
 
 CITIES = {

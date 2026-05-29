@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 WEATHER_CODES = {
     0: "clear",
     1: "mainly clear",
@@ -25,3 +28,16 @@ def log_cache_hit(name: str) -> None:
 
 def log_cache_miss(name: str) -> None:
     print(f"[CACHE MISS] {name}")
+
+#HackerNews returns: Unix timestamps
+def unix_to_datetime(
+    timestamp: int,
+) -> datetime:
+
+    return datetime.fromtimestamp(timestamp)
+
+
+def current_timestamp() -> str:
+    return datetime.now().strftime(
+        "%a, %d %b %Y, %H:%M"
+    )

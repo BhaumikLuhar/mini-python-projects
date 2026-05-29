@@ -9,6 +9,15 @@ class FxRate:
     change: float
     fetched_at: datetime
 
+    def to_dict(self):
+        return {
+            "from_currency": self.from_currency,
+            "to_currency": self.to_currency,
+            "rate": self.rate,
+            "change": self.change,
+            "fetched_at": self.fetched_at.isoformat()
+        }
+
 
 @dataclass
 class WeatherReport:
@@ -24,3 +33,11 @@ class NewsItem:
     url: str
     source: str
     published: datetime
+
+    def to_dict(self):
+        return {
+            "title": self.title,
+            "url": self.url,
+            "source": self.source,
+            "published": self.published.isoformat()
+        }

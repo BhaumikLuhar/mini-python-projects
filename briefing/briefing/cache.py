@@ -14,7 +14,7 @@ def is_cache_fresh(timestamp:float, ttl_seconds:int)-> bool:
 
     return age<ttl_seconds
 
-def load_cache(name:str, ttl_seconds:int)->dict[str, Any] | None:
+def load_cache(name:str, ttl_seconds:int)->list[dict[str, Any]] | None:
     
     path=cache_path(name)
 
@@ -40,7 +40,7 @@ def load_cache(name:str, ttl_seconds:int)->dict[str, Any] | None:
         return None
     
 
-def save_cache(name:str, data:dict[str, Any])->None:
+def save_cache(name:str, data:list[dict[str, Any]])->None:
     CACHE_DIR.mkdir(exist_ok=True)
 
     path=cache_path(name)
