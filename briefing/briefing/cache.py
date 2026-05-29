@@ -3,6 +3,7 @@ from textwrap import indent
 import time
 from pathlib import Path
 from typing import Any
+from datetime import datetime
 
 from briefing.config import CACHE_DIR
 
@@ -13,6 +14,15 @@ def is_cache_fresh(timestamp:float, ttl_seconds:int)-> bool:
     age=time.time()-timestamp
 
     return age<ttl_seconds
+
+def json_default(value):
+
+    if isinstance(value, datetime):
+        return value.isoformat()
+
+    raise TypeError(
+        f"Cannot serialize {type(value)}"
+    )
 
 def load_cache(name:str, ttl_seconds:int)->list[dict[str, Any]] | None:
     
@@ -51,7 +61,7 @@ def save_cache(name:str, data:list[dict[str, Any]])->None:
     }
 
     with open(path,"w")as f:
-        json.dump(payload,f,indent=4)
+        json.dump(payload,f,indent=4,default=json_default)
 
 
         

@@ -1,4 +1,6 @@
+from dataclasses import asdict
 from datetime import datetime
+from typing import Any
 
 
 WEATHER_CODES = {
@@ -41,3 +43,25 @@ def current_timestamp() -> str:
     return datetime.now().strftime(
         "%a, %d %b %Y, %H:%M"
     )
+
+
+def serialize_dataclass(
+    instance: Any,
+) -> dict[str, Any]:
+
+    data = asdict(instance)
+
+    for key, value in data.items():
+
+        if isinstance(value, datetime):
+
+            data[key] = value.isoformat()
+
+    return data
+
+
+def deserialize_datetime(
+    value: str,
+) -> datetime:
+
+    return datetime.fromisoformat(value)

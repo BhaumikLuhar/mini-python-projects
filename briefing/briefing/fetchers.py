@@ -1,5 +1,7 @@
 import os
 import httpx
+from datetime import datetime
+import asyncio
 
 from briefing.cache import (
     load_cache,
@@ -83,10 +85,23 @@ async def fetch_fx(client: httpx.AsyncClient,)->list[FxRate]:
     cached=load_cache(cache_name,CACHE_TTL_SECONDS)
 
     if cached:
-        rates=[]
 
-        for item in rates:
-            rates.append(FxRate(**item))
+        rates = []
+
+        for item in cached:
+
+            item["fetched_at"] = (
+                unix_to_datetime(0)
+                if isinstance(
+                    item["fetched_at"],
+                    int,
+                )
+                else item["fetched_at"]
+            )
+
+            rates.append(
+                FxRate(**item)
+            )
 
         return rates
     
@@ -98,8 +113,7 @@ async def fetch_fx(client: httpx.AsyncClient,)->list[FxRate]:
         )
 
     url = (
-        f"https://v6.exchangerate-api.com/"
-        f"v6/{api_key}/latest/USD"
+        f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
     )
 
     response = await client.get(url,timeout=REQUEST_TIMEOUT)
@@ -128,13 +142,48 @@ async def fetch_fx(client: httpx.AsyncClient,)->list[FxRate]:
 
         rates.append(fx)
 
-    rates=[item.to_dict() for item in rates]
+    cached_data=[item.to_dict() for item in rates]
     save_cache(
         cache_name,
-        rates,
+        cached_data,
     )
 
     return rates
+
+
+
+async def fetch_story(
+    client: httpx.AsyncClient,
+    story_id: int,
+) -> NewsItem:
+
+    story_url = (
+        "https://hacker-news.firebaseio.com/"
+        f"v0/item/{story_id}.json"
+    )
+
+    response = await client.get(
+        story_url,
+        timeout=REQUEST_TIMEOUT,
+    )
+
+    response.raise_for_status()
+
+    validated = (
+        HackerNewsStorySchema
+        .model_validate(
+            response.json()
+        )
+    )
+
+    return NewsItem(
+        title=validated.title,
+        url=validated.url or "",
+        source="HackerNews",
+        published=unix_to_datetime(
+            validated.time
+        ),
+    )
 
 
 async def fetch_news(
@@ -153,7 +202,9 @@ async def fetch_news(
         items = []
 
         for item in cached:
-
+            item["published"] = datetime.fromisoformat(
+            item["published"]
+            )
             items.append(
                 NewsItem(**item)
             )
@@ -174,34 +225,15 @@ async def fetch_news(
 
     story_ids = response.json()[:5]
 
-    items = []
-
-    for story_id in story_ids:
-
-        story_url = (
-            "https://hacker-news.firebaseio.com/"
-            f"v0/item/{story_id}.json"
+    items = await asyncio.gather(
+        *(
+            fetch_story(client, story_id)
+            for story_id in story_ids
         )
+    )
 
-        story_response=await client.get(story_url,timeout=REQUEST_TIMEOUT)
-
-        story_response.raise_for_status()
-
-        validated=(HackerNewsStorySchema.model_validate(story_response.json()))
-
-        news = NewsItem(
-            title=validated.title,
-            url=validated.url or "",
-            source="HackerNews",
-            published=unix_to_datetime(
-                validated.time
-            ),
-        )
-
-        items.append(news)
-
-    items=[item.to_dict() for item in items]
-    save_cache(cache_name,items)
+    cached_data=[item.to_dict() for item in items]
+    save_cache(cache_name,cached_data)
 
     return items
 
