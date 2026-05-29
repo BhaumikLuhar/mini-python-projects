@@ -2,3 +2,24 @@
 __pycache__/
 *.pyc
 .env
+
+# Virtual environment
+.Week4venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Cache files
+cache/
