@@ -1,67 +1,31 @@
-import json
-from textwrap import indent
-import time
-from pathlib import Path
 from typing import Any
-from datetime import datetime
 
-from briefing.config import CACHE_DIR
+from diskcache import Cache
 
-def cache_path(name: str)-> Path:
-    return CACHE_DIR / f"{name}.json"
+from briefing.config import (
+    CACHE_DIR,
+    CACHE_TTL_SECONDS,
+)
 
-def is_cache_fresh(timestamp:float, ttl_seconds:int)-> bool:
-    age=time.time()-timestamp
 
-    return age<ttl_seconds
+cache = Cache(CACHE_DIR)
 
-def json_default(value):
 
-    if isinstance(value, datetime):
-        return value.isoformat()
+def load_cache(
+    key: str,
+) -> Any | None:
 
-    raise TypeError(
-        f"Cannot serialize {type(value)}"
+    return cache.get(key)
+
+
+def save_cache(
+    key: str,
+    value: Any,
+    ttl: int = CACHE_TTL_SECONDS,
+) -> None:
+
+    cache.set(
+        key,
+        value,
+        expire=ttl,
     )
-
-def load_cache(name:str, ttl_seconds:int)->list[dict[str, Any]] | None:
-    
-    path=cache_path(name)
-
-    if not path.exists():
-        return None
-    
-    try:
-        with open(path,"r")as f:
-            payload=json.load(f)
-
-        timestamp=payload["timestamp"]
-
-        if not is_cache_fresh(timestamp, ttl_seconds):
-            return None
-        
-        return payload["data"]
-
-    except (
-        json.JSONDecodeError,
-        KeyError,
-        OSError,
-    ):
-        return None
-    
-
-def save_cache(name:str, data:list[dict[str, Any]])->None:
-    CACHE_DIR.mkdir(exist_ok=True)
-
-    path=cache_path(name)
-
-    payload={
-        "timestamp": time.time(),
-        "data":data,
-    }
-
-    with open(path,"w")as f:
-        json.dump(payload,f,indent=4,default=json_default)
-
-
-        

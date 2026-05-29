@@ -31,7 +31,7 @@ from briefing.utils import (
 async def fetch_weather(client: httpx.AsyncClient,)->list[WeatherReport]:
     cache_name="weather"
 
-    cached=load_cache(cache_name,CACHE_TTL_SECONDS)
+    cached=load_cache(cache_name)
 
     if cached:
         reports=[]
@@ -82,7 +82,7 @@ async def fetch_fx(client: httpx.AsyncClient,)->list[FxRate]:
 
     cache_name="fx"
 
-    cached=load_cache(cache_name,CACHE_TTL_SECONDS)
+    cached=load_cache(cache_name)
 
     if cached:
 
@@ -193,8 +193,7 @@ async def fetch_news(
     cache_name = "news"
 
     cached = load_cache(
-        cache_name,
-        CACHE_TTL_SECONDS,
+        cache_name
     )
 
     if cached:
